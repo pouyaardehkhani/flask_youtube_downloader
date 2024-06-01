@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader</title>
+</head>
+<body>
+    <h1>YouTube Downloader</h1>
+    <form method="post" action="{{ url_for('index') }}">
+        <label for="url">YouTube URL:</label>
+        <input type="url" id="url" name="url" required>
+        <button type="submit">Fetch Streams</button>
+    </form>
+
+    {% if video_qualities %}
+    <form method="post" action="{{ url_for('download') }}">
+        <input type="hidden" name="url" value="{{ url }}">
+        
+        <h2>Select Video Quality:</h2>
+        <select name="video_quality" required>
+            {% for quality in video_qualities %}
+            <option value="{{ quality }}">{{ quality }}</option>
+            {% endfor %}
+        </select>
+
+        <h2>Select Audio Quality:</h2>
+        <input type="checkbox" id="download_audio" name="download_audio">
+        <label for="download_audio">Download audio as well</label>
+        <select name="audio_quality">
+            {% for quality in audio_qualities %}
+            <option value="{{ quality }}">{{ quality }}</option>
+            {% endfor %}
+        </select>
+
+        <h2>Save Path:</h2>
+        <label for="save_path">Select file to simulate directory selection:</label>
+        <input type="file" id="save_path" name="save_path" required>
+
+        <button type="submit">Download</button>
+    </form>
+    {% endif %}
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+</body>
+</html>
