@@ -66,7 +66,7 @@ if url:
     if yt:
         video_quality = st.selectbox("Select video quality", video_qualities)
         audio_quality = st.selectbox("Select audio quality", audio_qualities)
-        save_path = "C:\Windows\System32\cmd.exe"
+        save_path = os.getcwd()
 
         if st.button("Download"):
             if not os.path.exists(save_path):
