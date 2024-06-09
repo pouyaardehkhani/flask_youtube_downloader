@@ -51,7 +51,7 @@ def merge_audio_video(video_file, audio_file, output_file):
         else:
             final_clip = video_clip
 
-        final_clip.write_videofile(output_file, codec='libx264', audio_codec='aac', progress_bar=False, verbose=False)
+        final_clip.write_videofile(output_file, codec='libx264', audio_codec='aac', logger=None)
         return output_file
     except Exception as e:
         st.error(f"Error during merging: {str(e)}")
