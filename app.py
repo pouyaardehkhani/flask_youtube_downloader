@@ -72,14 +72,23 @@ if url:
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
             video_file, audio_file = download_video(yt, video_quality, audio_quality, save_path)
-            if video_file:
-                output_file = os.path.join(save_path, f"{yt.title}.mp4")
-                merged_file = merge_audio_video(video_file, audio_file, output_file)
-                if merged_file:
-                    st.success("Download complete!")
-                    with open(merged_file, "rb") as file:
-                        st.download_button(label="Download Video", data=file, file_name=os.path.basename(merged_file))
+            download_merge = st.checkbox("Want to merge video and audio")
+            if download_merge:
+                if video_file:
+                    output_file = os.path.join(save_path, f"{yt.title}.mp4")
+                    merged_file = merge_audio_video(video_file, audio_file, output_file)
+                    if merged_file:
+                        st.success("Download complete!")
+                        with open(merged_file, "rb") as file:
+                            st.download_button(label="Download Video", data=file, file_name=os.path.basename(merged_file))
+                    else:
+                        st.error("Error merging the video and audio. Please try again.")
                 else:
-                    st.error("Error merging the video and audio. Please try again.")
-            else:
+                    st.error("Error downloading the video. Please try again.")
+            elif video_file:
                 st.error("Error downloading the video. Please try again.")
+            else:
+                with open(video_file, "rb") as file:
+                    st.download_button(label="Download Video", data=file, file_name=os.path.basename(video_file))
+                with open(audio_file, "rb") as file:
+                    st.download_button(label="Download Audio", data=file, file_name=os.path.basename(audio_file))
