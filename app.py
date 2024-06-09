@@ -73,7 +73,7 @@ if url:
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
             video_file, audio_file = download_video(yt, video_quality, audio_quality, save_path)
-            if not download_merge:
+            if download_merge:
                 if video_file:
                     output_file = os.path.join(save_path, f"{yt.title}.mp4")
                     merged_file = merge_audio_video(video_file, audio_file, output_file)
