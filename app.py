@@ -50,7 +50,7 @@ if url:
             audio_quality = st.selectbox("Select audio quality", audio_qualities)
         else:
             audio_quality = None
-        save_path = st.text_input("Enter save path")
+        save_path = "C:\Windows\System32\cmd.exe"
 
         if st.button("Download"):
             if not os.path.exists(save_path):
