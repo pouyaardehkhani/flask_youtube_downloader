@@ -3,6 +3,8 @@ from pytube import YouTube
 import os
 import moviepy.editor as mp
 
+st.set_page_config(page_title="YouTube Video Downloader")
+
 def fetch_streams(url):
     try:
         yt = YouTube(url)
@@ -18,33 +20,42 @@ def fetch_streams(url):
         return None, None, None
 
 def download_video(yt, video_quality, audio_quality, save_path):
-    res, cod = video_quality.strip().split(maxsplit=1)
+    try:
+        res, cod = video_quality.strip().split(maxsplit=1)
+        stream = yt.streams.filter(res=res, video_codec=cod, progressive=False).first()
+        if not stream:
+            st.error("Error: Selected video quality not available")
+            return None, None
 
-    stream = yt.streams.filter(res=res, video_codec=cod, progressive=False).first()
-    if not stream:
-        st.error("Error: Selected video quality not available")
-        return None
+        st.info(f"Downloading video: {stream}")
+        video_file = stream.download(output_path=save_path)
 
-    st.info(f"Downloading video: {stream}")
-    video_file = stream.download(output_path=save_path)
+        audio_file = None
+        if audio_quality:
+            audio_stream = yt.streams.filter(abr=audio_quality).first()
+            if audio_stream:
+                st.info(f"Downloading audio: {audio_stream}")
+                audio_file = audio_stream.download(output_path=save_path)
 
-    if audio_quality:
-        audio_stream = yt.streams.filter(abr=audio_quality).first()
-        if audio_stream:
-            st.info(f"Downloading audio: {audio_stream}")
-            audio_file = audio_stream.download(output_path=save_path)
-            output_file = os.path.join(save_path, f"{yt.title}.mp4")
-            merge_audio_video(video_file, audio_file, output_file)
-            return output_file, None
-    
-    return video_file, None
+        return video_file, audio_file
+    except Exception as e:
+        st.error(f"Error during download: {str(e)}")
+        return None, None
 
 def merge_audio_video(video_file, audio_file, output_file):
-    video_clip = mp.VideoFileClip(video_file)
-    audio_clip = mp.AudioFileClip(audio_file)
-    
-    final_clip = video_clip.set_audio(audio_clip)
-    final_clip.write_videofile(output_file, codec='libx264', audio_codec='aac', progress_bar=False, verbose=False)
+    try:
+        video_clip = mp.VideoFileClip(video_file)
+        if audio_file:
+            audio_clip = mp.AudioFileClip(audio_file)
+            final_clip = video_clip.set_audio(audio_clip)
+        else:
+            final_clip = video_clip
+
+        final_clip.write_videofile(output_file, codec='libx264', audio_codec='aac', progress_bar=False, verbose=False)
+        return output_file
+    except Exception as e:
+        st.error(f"Error during merging: {str(e)}")
+        return None
 
 st.title("YouTube Video Downloader")
 
@@ -59,10 +70,15 @@ if url:
         if st.button("Download"):
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
-            video_file, _ = download_video(yt, video_quality, audio_quality, save_path)
+            video_file, audio_file = download_video(yt, video_quality, audio_quality, save_path)
             if video_file:
-                st.success("Download complete!")
-                with open(video_file, "rb") as file:
-                    st.download_button(label="Download Video", data=file, file_name=os.path.basename(video_file))
+                output_file = os.path.join(save_path, f"{yt.title}.mp4")
+                merged_file = merge_audio_video(video_file, audio_file, output_file)
+                if merged_file:
+                    st.success("Download complete!")
+                    with open(merged_file, "rb") as file:
+                        st.download_button(label="Download Video", data=file, file_name=os.path.basename(merged_file))
+                else:
+                    st.error("Error merging the video and audio. Please try again.")
             else:
                 st.error("Error downloading the video. Please try again.")
