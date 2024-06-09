@@ -67,12 +67,12 @@ if url:
         video_quality = st.selectbox("Select video quality", video_qualities)
         audio_quality = st.selectbox("Select audio quality", audio_qualities)
         save_path = os.getcwd()
+        download_merge = st.checkbox("Want to merge video and audio?")
 
         if st.button("Download"):
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
             video_file, audio_file = download_video(yt, video_quality, audio_quality, save_path)
-            download_merge = st.checkbox("Want to merge video and audio")
             if download_merge:
                 if video_file:
                     output_file = os.path.join(save_path, f"{yt.title}.mp4")
@@ -85,8 +85,6 @@ if url:
                         st.error("Error merging the video and audio. Please try again.")
                 else:
                     st.error("Error downloading the video. Please try again.")
-            elif video_file:
-                st.error("Error downloading the video. Please try again.")
             else:
                 with open(video_file, "rb") as file:
                     st.download_button(label="Download Video", data=file, file_name=os.path.basename(video_file))
