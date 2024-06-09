@@ -67,7 +67,7 @@ if url:
         video_quality = st.selectbox("Select video quality", video_qualities)
         audio_quality = st.selectbox("Select audio quality", audio_qualities)
         save_path = os.getcwd()
-        download_merge = st.checkbox("Want to merge video and audio (slower)")
+        download_merge = st.checkbox("Want to merge video and audio. slower!!!")
 
         if st.button("Download"):
             if not os.path.exists(save_path):
