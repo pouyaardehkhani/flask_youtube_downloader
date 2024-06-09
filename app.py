@@ -44,7 +44,7 @@ def merge_audio_video(video_file, audio_file, output_file):
     audio_clip = mp.AudioFileClip(audio_file)
     
     final_clip = video_clip.set_audio(audio_clip)
-    final_clip.write_videofile(output_file, codec='libx264', audio_codec='aac')
+    final_clip.write_videofile(output_file, codec='libx264', audio_codec='aac', progress_bar=False, verbose=False)
 
 st.title("YouTube Video Downloader")
 
